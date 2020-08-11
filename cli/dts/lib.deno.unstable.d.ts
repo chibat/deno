@@ -1217,7 +1217,7 @@ declare namespace Deno {
 
   /** **UNSTABLE**: New API, yet to be vetted.
    * A custom HttpClient for use with `fetch`.
-   * 
+   *
    * ```ts
    * const client = new Deno.createHttpClient({ caFile: "./ca.pem" });
    * const req = await fetch("https://myserver.com", { client });
@@ -1233,15 +1233,17 @@ declare namespace Deno {
    */
   interface CreateHttpClientOptions {
     /** A certificate authority to use when validating TLS certificates.
-     * 
+     *
      * Requires `allow-read` permission.
      */
     caFile?: string;
+
+    proxy?: string;
   }
 
   /** **UNSTABLE**: New API, yet to be vetted.
    * Create a custom HttpClient for to use with `fetch`.
-   * 
+   *
    * ```ts
    * const client = new Deno.createHttpClient({ caFile: "./ca.pem" });
    * const req = await fetch("https://myserver.com", { client });

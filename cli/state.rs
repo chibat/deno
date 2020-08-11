@@ -340,7 +340,7 @@ impl State {
       global_state.permissions.clone()
     };
 
-    let http_client = create_http_client(global_state.flags.ca_file.clone())?;
+    let http_client = create_http_client(global_state.flags.ca_file.clone(), None)?;
 
     let state = Rc::new(RefCell::new(StateInner {
       global_state,
@@ -379,7 +379,7 @@ impl State {
       global_state.permissions.clone()
     };
 
-    let http_client = create_http_client(global_state.flags.ca_file.clone())?;
+    let http_client = create_http_client(global_state.flags.ca_file.clone(), None)?;
 
     let state = Rc::new(RefCell::new(StateInner {
       global_state,

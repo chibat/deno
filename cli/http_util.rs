@@ -26,7 +26,7 @@ use url::Url;
 
 /// Create new instance of async reqwest::Client. This client supports
 /// proxies and doesn't follow redirects.
-pub fn create_http_client(ca_file: Option<String>) -> Result<Client, ErrBox> {
+pub fn create_http_client(ca_file: Option<String>, proxy: Option<String>) -> Result<Client, ErrBox> {
   let mut headers = HeaderMap::new();
   headers.insert(
     USER_AGENT,
@@ -42,6 +42,10 @@ pub fn create_http_client(ca_file: Option<String>) -> Result<Client, ErrBox> {
     File::open(ca_file)?.read_to_end(&mut buf)?;
     let cert = reqwest::Certificate::from_pem(&buf)?;
     builder = builder.add_root_certificate(cert);
+  }
+
+  if let Some(proxy) = proxy {
+    builder = builder.proxy(reqwest::Proxy::all(&proxy)?);
   }
 
   builder.build().map_err(|_| {

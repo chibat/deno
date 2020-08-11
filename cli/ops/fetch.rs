@@ -133,6 +133,7 @@ impl HttpClientResource {
 #[serde(default)]
 struct CreateHttpClientOptions {
   ca_file: Option<String>,
+  proxy: Option<String>,
 }
 
 fn op_create_http_client(
@@ -148,7 +149,7 @@ fn op_create_http_client(
     state.check_read(&PathBuf::from(ca_file))?;
   }
 
-  let client = create_http_client(args.ca_file).unwrap();
+  let client = create_http_client(args.ca_file, args.proxy).unwrap();
 
   let rid =
     resource_table.add("httpClient", Box::new(HttpClientResource::new(client)));

@@ -12,7 +12,7 @@ async function proxyServer(): Promise<void> {
 
 async function proxyRequest(req: ServerRequest): Promise<void> {
   console.log(`Proxy request to: ` + JSON.stringify(req.method));
-  const resp = await fetch("https://" + req.url, {
+  const resp = await fetch(req.url, {
     method: req.method,
     headers: req.headers,
   });
@@ -26,7 +26,7 @@ async function proxyRequest(req: ServerRequest): Promise<void> {
 proxyServer();
 
 const client = Deno.createHttpClient({proxy: "http://localhost:4555"});
-const res = await fetch("https://google.com", {client: client});
+const res = await fetch("http://localhost:4545/std/examples/colors.ts", {client: client});
 
 const body = new Uint8Array(await res.arrayBuffer());
 await Deno.stdout.write(body);

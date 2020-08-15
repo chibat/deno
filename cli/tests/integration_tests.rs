@@ -1603,6 +1603,11 @@ itest!(_060_deno_doc_displays_all_overloads_in_details_view {
   output: "060_deno_doc_displays_all_overloads_in_details_view.ts.out",
 });
 
+itest!(_061_configurable_proxy {
+  args: "run 061_configurable_proxy.ts",
+  output: "061_configurable_proxy.ts.out",
+});
+
 itest!(js_import_detect {
   args: "run --quiet --reload js_import_detect.ts",
   output: "js_import_detect.ts.out",

@@ -256,7 +256,7 @@ mod tests {
     // Relies on external http server. See target/debug/test_server
     let url =
       Url::parse("http://127.0.0.1:4545/cli/tests/fixture.json").unwrap();
-    let client = create_http_client(None).unwrap();
+    let client = create_http_client(None, None).unwrap();
     let result = fetch_once(client, &url, None).await;
     if let Ok(FetchOnceResult::Code(body, headers)) = result {
       assert!(!body.is_empty());
@@ -277,7 +277,7 @@ mod tests {
       "http://127.0.0.1:4545/cli/tests/053_import_compression/gziped",
     )
     .unwrap();
-    let client = create_http_client(None).unwrap();
+    let client = create_http_client(None, None).unwrap();
     let result = fetch_once(client, &url, None).await;
     if let Ok(FetchOnceResult::Code(body, headers)) = result {
       assert_eq!(String::from_utf8(body).unwrap(), "console.log('gzip')");
@@ -297,7 +297,7 @@ mod tests {
   async fn test_fetch_with_etag() {
     let http_server_guard = test_util::http_server();
     let url = Url::parse("http://127.0.0.1:4545/etag_script.ts").unwrap();
-    let client = create_http_client(None).unwrap();
+    let client = create_http_client(None, None).unwrap();
     let result = fetch_once(client.clone(), &url, None).await;
     if let Ok(FetchOnceResult::Code(body, headers)) = result {
       assert!(!body.is_empty());
@@ -326,7 +326,7 @@ mod tests {
       "http://127.0.0.1:4545/cli/tests/053_import_compression/brotli",
     )
     .unwrap();
-    let client = create_http_client(None).unwrap();
+    let client = create_http_client(None, None).unwrap();
     let result = fetch_once(client, &url, None).await;
     if let Ok(FetchOnceResult::Code(body, headers)) = result {
       assert!(!body.is_empty());
@@ -352,7 +352,7 @@ mod tests {
     // Dns resolver substitutes `127.0.0.1` with `localhost`
     let target_url =
       Url::parse("http://localhost:4545/cli/tests/fixture.json").unwrap();
-    let client = create_http_client(None).unwrap();
+    let client = create_http_client(None, None).unwrap();
     let result = fetch_once(client, &url, None).await;
     if let Ok(FetchOnceResult::Redirect(url, _)) = result {
       assert_eq!(url, target_url);
@@ -412,7 +412,7 @@ mod tests {
         .join("std/http/testdata/tls/RootCA.pem")
         .to_str()
         .unwrap(),
-    )))
+    )), None)
     .unwrap();
     let result = fetch_once(client, &url, None).await;
     if let Ok(FetchOnceResult::Code(body, headers)) = result {
@@ -439,7 +439,7 @@ mod tests {
         .join("std/http/testdata/tls/RootCA.pem")
         .to_str()
         .unwrap(),
-    )))
+    )), None)
     .unwrap();
     let result = fetch_once(client, &url, None).await;
     if let Ok(FetchOnceResult::Code(body, headers)) = result {
@@ -465,7 +465,7 @@ mod tests {
         .join("std/http/testdata/tls/RootCA.pem")
         .to_str()
         .unwrap(),
-    )))
+    )), None)
     .unwrap();
     let result = fetch_once(client.clone(), &url, None).await;
     if let Ok(FetchOnceResult::Code(body, headers)) = result {
@@ -501,7 +501,7 @@ mod tests {
         .join("std/http/testdata/tls/RootCA.pem")
         .to_str()
         .unwrap(),
-    )))
+    )), None)
     .unwrap();
     let result = fetch_once(client, &url, None).await;
     if let Ok(FetchOnceResult::Code(body, headers)) = result {

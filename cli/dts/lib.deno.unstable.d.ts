@@ -48,7 +48,7 @@ declare namespace Deno {
    * Gets the size of the console as columns/rows.
    *
    * ```ts
-   * const { columns, rows } = await Deno.consoleSize(Deno.stdout.rid);
+   * const { columns, rows } = Deno.consoleSize(Deno.stdout.rid);
    * ```
    */
   export function consoleSize(
@@ -1097,9 +1097,6 @@ declare namespace Deno {
    *  Requires `allow-env` permission.
    */
   export function hostname(): string;
-
-  /** **UNSTABLE**: The URL of the file that was originally executed from the command-line. */
-  export const mainModule: string;
 
   /** **UNSTABLE**: new API, yet to be vetted.
    * Synchronously truncates or extends the specified file stream, to reach the

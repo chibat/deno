@@ -1235,7 +1235,15 @@ declare namespace Deno {
      */
     caFile?: string;
 
-    proxy?: string;
+    proxy?: Proxy;
+  }
+
+  interface Proxy {
+    url: string;
+    basicAuth?: {
+      username: string;
+      password: string;
+    }
   }
 
   /** **UNSTABLE**: New API, yet to be vetted.

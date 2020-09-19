@@ -26,7 +26,7 @@ use url::Url;
 
 /// Create new instance of async reqwest::Client. This client supports
 /// proxies and doesn't follow redirects.
-pub fn create_http_client(ca_file: Option<String>, proxy: Option<String>) -> Result<Client, ErrBox> {
+pub fn create_http_client(ca_file: Option<String>, proxy: Option<Proxy>) -> Result<Client, ErrBox> {
   let mut headers = HeaderMap::new();
   headers.insert(
     USER_AGENT,
@@ -45,7 +45,11 @@ pub fn create_http_client(ca_file: Option<String>, proxy: Option<String>) -> Res
   }
 
   if let Some(proxy) = proxy {
-    builder = builder.proxy(reqwest::Proxy::all(&proxy)?);
+    let mut p = reqwest::Proxy::all(&proxy.url)?;
+    if let Some(basic_auth) = &proxy.basic_auth {
+      p = p.basic_auth(&basic_auth.username, &basic_auth.password);
+    }
+    builder = builder.proxy(p);
   }
 
   builder.build().map_err(|_| {
@@ -170,6 +174,16 @@ pub fn fetch_once(
   };
 
   fut.boxed()
+}
+
+pub struct Proxy {
+  pub url: String,
+  pub basic_auth: Option<BasicAuth>,
+}
+
+pub struct BasicAuth {
+  pub username: String,
+  pub password: String,
 }
 
 /// Wraps reqwest `Response` so that it can be exposed as an `AsyncRead` and integrated

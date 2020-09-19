@@ -163,13 +163,19 @@ fn op_create_http_client(
   }
 
   // TODO
-  let mut p: Option<crate::http_util::Proxy> = None;
-  if let Some(proxy) = args.proxy {
-    p = Some(crate::http_util::Proxy {url: proxy.url, basic_auth: None});
-  }
+  let proxy = if let Some(proxy) = args.proxy {
+    let basic_auth = if let Some(basic_auth) = proxy.basic_auth {
+      Some(crate::http_util::BasicAuth {username: basic_auth.username, password: basic_auth.password})
+    } else {
+      None
+    };
+    Some(crate::http_util::Proxy {url: proxy.url, basic_auth: basic_auth})
+  } else {
+    None
+  };
 
   //let client = create_http_client(args.ca_file, None).unwrap();
-  let client = create_http_client(args.ca_file, p).unwrap();
+  let client = create_http_client(args.ca_file, proxy).unwrap();
 
   let rid =
     resource_table.add("httpClient", Box::new(HttpClientResource::new(client)));

@@ -3,6 +3,7 @@ use crate::file_fetcher::SourceFileFetcher;
 use crate::global_state::GlobalState;
 use crate::global_timer::GlobalTimer;
 use crate::http_util::create_http_client;
+use crate::http_util::CreateHttpClientOptions;
 use crate::import_map::ImportMap;
 use crate::metrics::Metrics;
 use crate::op_error::OpError;
@@ -367,7 +368,7 @@ impl State {
       global_state.permissions.clone()
     };
 
-    let http_client = create_http_client(global_state.flags.ca_file.clone(), None)?;
+    let http_client = create_http_client(Some(CreateHttpClientOptions {ca_file: global_state.flags.ca_file.clone(), proxy: None}))?;
 
     let state = Rc::new(RefCell::new(StateInner {
       global_state,
@@ -406,7 +407,7 @@ impl State {
       global_state.permissions.clone()
     };
 
-    let http_client = create_http_client(global_state.flags.ca_file.clone(), None)?;
+    let http_client = create_http_client(Some(CreateHttpClientOptions{ca_file: global_state.flags.ca_file.clone(), proxy: None}))?;
 
     let state = Rc::new(RefCell::new(StateInner {
       global_state,

@@ -162,7 +162,6 @@ fn op_create_http_client(
     state.check_read(&PathBuf::from(ca_file))?;
   }
 
-  // TODO
   let proxy = if let Some(proxy) = args.proxy {
     let basic_auth = if let Some(basic_auth) = proxy.basic_auth {
       Some(crate::http_util::BasicAuth {username: basic_auth.username, password: basic_auth.password})
@@ -175,7 +174,7 @@ fn op_create_http_client(
   };
 
   //let client = create_http_client(args.ca_file, None).unwrap();
-  let client = create_http_client(args.ca_file, proxy).unwrap();
+  let client = create_http_client(Some(crate::http_util::CreateHttpClientOptions {ca_file: args.ca_file, proxy: proxy})).unwrap();
 
   let rid =
     resource_table.add("httpClient", Box::new(HttpClientResource::new(client)));

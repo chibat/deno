@@ -26,7 +26,7 @@ use url::Url;
 
 /// Create new instance of async reqwest::Client. This client supports
 /// proxies and doesn't follow redirects.
-pub fn create_http_client(ca_file: Option<String>, proxy: Option<Proxy>) -> Result<Client, ErrBox> {
+pub fn create_http_client(options: Option<CreateHttpClientOptions>) -> Result<Client, ErrBox> {
   let mut headers = HeaderMap::new();
   headers.insert(
     USER_AGENT,
@@ -37,19 +37,22 @@ pub fn create_http_client(ca_file: Option<String>, proxy: Option<Proxy>) -> Resu
     .default_headers(headers)
     .use_rustls_tls();
 
-  if let Some(ca_file) = ca_file {
-    let mut buf = Vec::new();
-    File::open(ca_file)?.read_to_end(&mut buf)?;
-    let cert = reqwest::Certificate::from_pem(&buf)?;
-    builder = builder.add_root_certificate(cert);
-  }
+  if let Some(options) = options {
 
-  if let Some(proxy) = proxy {
-    let mut p = reqwest::Proxy::all(&proxy.url)?;
-    if let Some(basic_auth) = &proxy.basic_auth {
-      p = p.basic_auth(&basic_auth.username, &basic_auth.password);
+    if let Some(ca_file) = options.ca_file {
+      let mut buf = Vec::new();
+      File::open(ca_file)?.read_to_end(&mut buf)?;
+      let cert = reqwest::Certificate::from_pem(&buf)?;
+      builder = builder.add_root_certificate(cert);
     }
-    builder = builder.proxy(p);
+
+    if let Some(proxy) = options.proxy {
+      let mut p = reqwest::Proxy::all(&proxy.url)?;
+      if let Some(basic_auth) = &proxy.basic_auth {
+        p = p.basic_auth(&basic_auth.username, &basic_auth.password);
+      }
+      builder = builder.proxy(p);
+    }
   }
 
   builder.build().map_err(|_| {
@@ -176,6 +179,11 @@ pub fn fetch_once(
   fut.boxed()
 }
 
+pub struct CreateHttpClientOptions {
+  pub ca_file: Option<String>,
+  pub proxy: Option<Proxy>,
+}
+
 pub struct Proxy {
   pub url: String,
   pub basic_auth: Option<BasicAuth>,
@@ -270,7 +278,7 @@ mod tests {
     // Relies on external http server. See target/debug/test_server
     let url =
       Url::parse("http://127.0.0.1:4545/cli/tests/fixture.json").unwrap();
-    let client = create_http_client(None, None).unwrap();
+    let client = create_http_client(None).unwrap();
     let result = fetch_once(client, &url, None).await;
     if let Ok(FetchOnceResult::Code(body, headers)) = result {
       assert!(!body.is_empty());
@@ -290,7 +298,7 @@ mod tests {
       "http://127.0.0.1:4545/cli/tests/053_import_compression/gziped",
     )
     .unwrap();
-    let client = create_http_client(None, None).unwrap();
+    let client = create_http_client(None).unwrap();
     let result = fetch_once(client, &url, None).await;
     if let Ok(FetchOnceResult::Code(body, headers)) = result {
       assert_eq!(String::from_utf8(body).unwrap(), "console.log('gzip')");
@@ -309,7 +317,7 @@ mod tests {
   async fn test_fetch_with_etag() {
     let _http_server_guard = test_util::http_server();
     let url = Url::parse("http://127.0.0.1:4545/etag_script.ts").unwrap();
-    let client = create_http_client(None, None).unwrap();
+    let client = create_http_client(None).unwrap();
     let result = fetch_once(client.clone(), &url, None).await;
     if let Ok(FetchOnceResult::Code(body, headers)) = result {
       assert!(!body.is_empty());
@@ -336,7 +344,7 @@ mod tests {
       "http://127.0.0.1:4545/cli/tests/053_import_compression/brotli",
     )
     .unwrap();
-    let client = create_http_client(None, None).unwrap();
+    let client = create_http_client(None).unwrap();
     let result = fetch_once(client, &url, None).await;
     if let Ok(FetchOnceResult::Code(body, headers)) = result {
       assert!(!body.is_empty());
@@ -361,7 +369,7 @@ mod tests {
     // Dns resolver substitutes `127.0.0.1` with `localhost`
     let target_url =
       Url::parse("http://localhost:4545/cli/tests/fixture.json").unwrap();
-    let client = create_http_client(None, None).unwrap();
+    let client = create_http_client(None).unwrap();
     let result = fetch_once(client, &url, None).await;
     if let Ok(FetchOnceResult::Redirect(url, _)) = result {
       assert_eq!(url, target_url);
@@ -420,7 +428,7 @@ mod tests {
         .join("std/http/testdata/tls/RootCA.pem")
         .to_str()
         .unwrap(),
-    )), None)
+    )))
     .unwrap();
     let result = fetch_once(client, &url, None).await;
     if let Ok(FetchOnceResult::Code(body, headers)) = result {
@@ -446,7 +454,7 @@ mod tests {
         .join("std/http/testdata/tls/RootCA.pem")
         .to_str()
         .unwrap(),
-    )), None)
+    )))
     .unwrap();
     let result = fetch_once(client, &url, None).await;
     if let Ok(FetchOnceResult::Code(body, headers)) = result {
@@ -471,7 +479,7 @@ mod tests {
         .join("std/http/testdata/tls/RootCA.pem")
         .to_str()
         .unwrap(),
-    )), None)
+    )))
     .unwrap();
     let result = fetch_once(client.clone(), &url, None).await;
     if let Ok(FetchOnceResult::Code(body, headers)) = result {
@@ -505,7 +513,7 @@ mod tests {
         .join("std/http/testdata/tls/RootCA.pem")
         .to_str()
         .unwrap(),
-    )), None)
+    )))
     .unwrap();
     let result = fetch_once(client, &url, None).await;
     if let Ok(FetchOnceResult::Code(body, headers)) = result {

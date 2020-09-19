@@ -130,7 +130,7 @@ impl SourceFileFetcher {
       use_disk_cache,
       no_remote,
       cached_only,
-      http_client: create_http_client(ca_file, None)?,
+      http_client: create_http_client(Some(http_util::CreateHttpClientOptions{ca_file: ca_file, proxy: None}))?,
     };
 
     Ok(file_fetcher)

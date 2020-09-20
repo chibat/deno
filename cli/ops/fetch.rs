@@ -173,7 +173,6 @@ fn op_create_http_client(
     None
   };
 
-  //let client = create_http_client(args.ca_file, None).unwrap();
   let client = create_http_client(Some(crate::http_util::CreateHttpClientOptions {ca_file: args.ca_file, proxy: proxy})).unwrap();
 
   let rid =

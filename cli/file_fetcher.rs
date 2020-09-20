@@ -4,6 +4,7 @@ use crate::http_cache::HttpCache;
 use crate::http_util;
 use crate::http_util::create_http_client;
 use crate::http_util::FetchOnceResult;
+use crate::http_util::CreateHttpClientOptions;
 use crate::msg;
 use crate::op_error::OpError;
 use crate::permissions::Permissions;
@@ -130,7 +131,7 @@ impl SourceFileFetcher {
       use_disk_cache,
       no_remote,
       cached_only,
-      http_client: create_http_client(Some(http_util::CreateHttpClientOptions{ca_file: ca_file, ..Default::default()}))?,
+      http_client: create_http_client(Some(CreateHttpClientOptions{ca_file: ca_file, ..Default::default()}))?,
     };
 
     Ok(file_fetcher)

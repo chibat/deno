@@ -1,6 +1,7 @@
 // Copyright 2018-2020 the Deno authors. All rights reserved. MIT license.
 use super::dispatch_json::{Deserialize, JsonOp, Value};
 use super::io::{StreamResource, StreamResourceHolder};
+use crate::http_util;
 use crate::http_util::{create_http_client, HttpBody};
 use crate::op_error::OpError;
 use crate::state::State;
@@ -164,16 +165,16 @@ fn op_create_http_client(
 
   let proxy = if let Some(proxy) = args.proxy {
     let basic_auth = if let Some(basic_auth) = proxy.basic_auth {
-      Some(crate::http_util::BasicAuth {username: basic_auth.username, password: basic_auth.password})
+      Some(http_util::BasicAuth {username: basic_auth.username, password: basic_auth.password})
     } else {
       None
     };
-    Some(crate::http_util::Proxy {url: proxy.url, basic_auth: basic_auth})
+    Some(http_util::Proxy {url: proxy.url, basic_auth: basic_auth})
   } else {
     None
   };
 
-  let client = create_http_client(Some(crate::http_util::CreateHttpClientOptions {ca_file: args.ca_file, proxy: proxy})).unwrap();
+  let client = create_http_client(Some(http_util::CreateHttpClientOptions {ca_file: args.ca_file, proxy: proxy})).unwrap();
 
   let rid =
     resource_table.add("httpClient", Box::new(HttpClientResource::new(client)));

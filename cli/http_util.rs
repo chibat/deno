@@ -179,6 +179,7 @@ pub fn fetch_once(
   fut.boxed()
 }
 
+#[derive(Default)]
 pub struct CreateHttpClientOptions {
   pub ca_file: Option<String>,
   pub proxy: Option<Proxy>,

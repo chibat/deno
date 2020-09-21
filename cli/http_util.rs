@@ -424,12 +424,14 @@ mod tests {
     let url =
       Url::parse("https://localhost:5545/cli/tests/fixture.json").unwrap();
 
-    let client = create_http_client(Some(String::from(
+    let options = Some(CreateHttpClientOptions{ca_file: Some(String::from(
       test_util::root_path()
         .join("std/http/testdata/tls/RootCA.pem")
         .to_str()
         .unwrap(),
-    )))
+    )), ..Default::default()});
+
+    let client = create_http_client(options)
     .unwrap();
     let result = fetch_once(client, &url, None).await;
     if let Ok(FetchOnceResult::Code(body, headers)) = result {

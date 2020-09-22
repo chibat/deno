@@ -47,11 +47,11 @@ pub fn create_http_client(options: Option<CreateHttpClientOptions>) -> Result<Cl
     }
 
     if let Some(proxy) = options.proxy {
-      let mut p = reqwest::Proxy::all(&proxy.url)?;
+      let mut reqwest_proxy  = reqwest::Proxy::all(&proxy.url)?;
       if let Some(basic_auth) = &proxy.basic_auth {
-        p = p.basic_auth(&basic_auth.username, &basic_auth.password);
+        reqwest_proxy = reqwest_proxy.basic_auth(&basic_auth.username, &basic_auth.password);
       }
-      builder = builder.proxy(p);
+      builder = builder.proxy(reqwest_proxy);
     }
   }
 

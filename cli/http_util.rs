@@ -423,14 +423,12 @@ mod tests {
     // Relies on external http server. See target/debug/test_server
     let url =
       Url::parse("https://localhost:5545/cli/tests/fixture.json").unwrap();
-
     let options = Some(CreateHttpClientOptions{ca_file: Some(String::from(
       test_util::root_path()
         .join("std/http/testdata/tls/RootCA.pem")
         .to_str()
         .unwrap(),
     )), ..Default::default()});
-
     let client = create_http_client(options)
     .unwrap();
     let result = fetch_once(client, &url, None).await;
@@ -452,12 +450,13 @@ mod tests {
       "https://localhost:5545/cli/tests/053_import_compression/gziped",
     )
     .unwrap();
-    let client = create_http_client(Some(String::from(
+    let options = Some(CreateHttpClientOptions{ca_file: Some(String::from(
       test_util::root_path()
         .join("std/http/testdata/tls/RootCA.pem")
         .to_str()
         .unwrap(),
-    )))
+    )), ..Default::default()});
+    let client = create_http_client(options)
     .unwrap();
     let result = fetch_once(client, &url, None).await;
     if let Ok(FetchOnceResult::Code(body, headers)) = result {
@@ -477,12 +476,13 @@ mod tests {
   async fn test_fetch_with_cafile_with_etag() {
     let _http_server_guard = test_util::http_server();
     let url = Url::parse("https://localhost:5545/etag_script.ts").unwrap();
-    let client = create_http_client(Some(String::from(
+    let options = Some(CreateHttpClientOptions{ca_file: Some(String::from(
       test_util::root_path()
         .join("std/http/testdata/tls/RootCA.pem")
         .to_str()
         .unwrap(),
-    )))
+    )), ..Default::default()});
+    let client = create_http_client(options)
     .unwrap();
     let result = fetch_once(client.clone(), &url, None).await;
     if let Ok(FetchOnceResult::Code(body, headers)) = result {
@@ -511,12 +511,13 @@ mod tests {
       "https://localhost:5545/cli/tests/053_import_compression/brotli",
     )
     .unwrap();
-    let client = create_http_client(Some(String::from(
+    let options = Some(CreateHttpClientOptions{ca_file: Some(String::from(
       test_util::root_path()
         .join("std/http/testdata/tls/RootCA.pem")
         .to_str()
         .unwrap(),
-    )))
+    )), ..Default::default()});
+    let client = create_http_client(options)
     .unwrap();
     let result = fetch_once(client, &url, None).await;
     if let Ok(FetchOnceResult::Code(body, headers)) = result {

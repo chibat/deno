@@ -331,7 +331,7 @@ impl FileFetcher {
       cache: Default::default(),
       cache_setting,
       http_cache,
-      http_client: create_http_client(get_user_agent(), ca_data)?,
+      http_client: create_http_client(get_user_agent(), ca_data, None)?,
     })
   }
 

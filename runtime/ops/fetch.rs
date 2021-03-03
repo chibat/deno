@@ -7,12 +7,13 @@ pub fn init(
   rt: &mut deno_core::JsRuntime,
   user_agent: String,
   ca_data: Option<Vec<u8>>,
+  proxy: Option<http_util::Proxy>,
 ) {
   {
     let op_state = rt.op_state();
     let mut state = op_state.borrow_mut();
     state.put::<reqwest::Client>({
-      http_util::create_http_client(user_agent, ca_data).unwrap()
+      http_util::create_http_client(user_agent, ca_data, proxy).unwrap()
     });
   }
   super::reg_json_sync(rt, "op_fetch", deno_fetch::op_fetch::<Permissions>);

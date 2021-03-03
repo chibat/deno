@@ -22,6 +22,7 @@ use std::collections::HashMap;
 pub fn create_http_client(
   user_agent: String,
   ca_data: Option<Vec<u8>>,
+  proxy: Option<Proxy>,
 ) -> Result<Client, AnyError> {
   let mut headers = HeaderMap::new();
   headers.insert(USER_AGENT, user_agent.parse().unwrap());
@@ -33,6 +34,14 @@ pub fn create_http_client(
   if let Some(ca_data) = ca_data {
     let cert = reqwest::Certificate::from_pem(&ca_data)?;
     builder = builder.add_root_certificate(cert);
+  }
+
+  if let Some(proxy) = proxy {
+    let mut reqwest_proxy  = reqwest::Proxy::all(&proxy.url)?;
+    if let Some(basic_auth) = &proxy.basic_auth {
+      reqwest_proxy = reqwest_proxy.basic_auth(&basic_auth.username, &basic_auth.password);
+    }
+    builder = builder.proxy(reqwest_proxy);
   }
 
   builder
@@ -85,6 +94,16 @@ pub struct FetchOnceArgs {
   pub url: Url,
   pub maybe_etag: Option<String>,
   pub maybe_auth_token: Option<AuthToken>,
+}
+
+pub struct Proxy {
+  pub url: String,
+  pub basic_auth: Option<BasicAuth>,
+}
+
+pub struct BasicAuth {
+  pub username: String,
+  pub password: String,
 }
 
 /// Asynchronously fetches the given HTTP URL one pass only.
@@ -445,6 +464,7 @@ mod tests {
         )
         .unwrap(),
       ),
+      None,
     )
     .unwrap();
     let result = fetch_once(FetchOnceArgs {
@@ -496,6 +516,7 @@ mod tests {
         )
         .unwrap(),
       ),
+      None,
     )
     .unwrap();
     let result = fetch_once(FetchOnceArgs {

@@ -13,6 +13,7 @@ use deno_fetch::reqwest::Client;
 pub fn create_http_client(
   user_agent: String,
   ca_data: Option<Vec<u8>>,
+  proxy: Option<Proxy>,
 ) -> Result<Client, AnyError> {
   let mut headers = HeaderMap::new();
   headers.insert(USER_AGENT, user_agent.parse().unwrap());
@@ -26,9 +27,27 @@ pub fn create_http_client(
     builder = builder.add_root_certificate(cert);
   }
 
+  if let Some(proxy) = proxy {
+    let mut reqwest_proxy  = reqwest::Proxy::all(&proxy.url)?;
+    if let Some(basic_auth) = &proxy.basic_auth {
+      reqwest_proxy = reqwest_proxy.basic_auth(&basic_auth.username, &basic_auth.password);
+    }
+    builder = builder.proxy(reqwest_proxy);
+  }
+
   builder
     .build()
     .map_err(|e| generic_error(format!("Unable to build http client: {}", e)))
+}
+
+pub struct Proxy {
+  pub url: String,
+  pub basic_auth: Option<BasicAuth>,
+}
+
+pub struct BasicAuth {
+  pub username: String,
+  pub password: String,
 }
 
 #[cfg(test)]
@@ -37,6 +56,6 @@ mod tests {
 
   #[test]
   fn create_test_client() {
-    create_http_client("test_client".to_string(), None).unwrap();
+    create_http_client("test_client".to_string(), None, None).unwrap();
   }
 }

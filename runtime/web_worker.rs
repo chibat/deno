@@ -222,6 +222,7 @@ impl WebWorker {
         js_runtime,
         options.user_agent.clone(),
         options.ca_data.clone(),
+        None,
       );
       ops::timers::init(js_runtime);
       ops::worker_host::init(

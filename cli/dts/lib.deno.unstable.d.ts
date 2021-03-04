@@ -1118,7 +1118,7 @@ declare namespace Deno {
     basicAuth?: {
       username: string;
       password: string;
-    }
+    };
   }
 
   /** **UNSTABLE**: New API, yet to be vetted.

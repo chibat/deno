@@ -1110,6 +1110,15 @@ declare namespace Deno {
     /** A certificate authority to use when validating TLS certificates. Certificate data must be PEM encoded.
      */
     caData?: string;
+    proxy?: Proxy;
+  }
+
+  interface Proxy {
+    url: string;
+    basicAuth?: {
+      username: string;
+      password: string;
+    }
   }
 
   /** **UNSTABLE**: New API, yet to be vetted.

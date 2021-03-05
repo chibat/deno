@@ -1109,7 +1109,7 @@ declare namespace Deno {
   interface CreateHttpClientOptions {
     /** A certificate authority to use when validating TLS certificates. Certificate data must be PEM encoded.
      */
-    caData?: string;
+    // caData?: string; // debug
     proxy?: Proxy;
   }
 
